@@ -4,6 +4,7 @@ import UserService from "../services/UserService";
 
 class UserStore {
     userList = [];
+    totalCount = 0;
     searchText = React.createRef('');
     
     constructor() {
@@ -11,16 +12,22 @@ class UserStore {
         makeAutoObservable(this);
     }
 
-    async getUsersAsync() {
-        var response = await this.userService.getAsync();
+    async getUsersAsync(currentPage, pageSize) {
+        var response = await this.userService.getAsync(
+            {
+                textSearch: this.searchText.current ? this.searchText.current.value : '',
+                currentPage: currentPage ? currentPage : 1,
+                pageSize: pageSize ? pageSize : 10
+            }
+        );
         runInAction(() => {
-            console.log('usao');
-            this.userList = response.data.items
+            this.userList = response.data.items;
+            this.totalCount = response.data.totalCount;
         });
     }
 
     async deleteUserAsync(id){
-        var response = await this.userService.deleteAsync(id);
+        await this.userService.deleteAsync(id);
     }
 
     get noUsers() {

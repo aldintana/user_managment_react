@@ -1,52 +1,82 @@
-import { useEffect } from "react";
+import React,  { useState,  useEffect } from "react";
 import { useStore } from "../../../stores";
+import { observer } from "mobx-react";
+import DataTable from "react-data-table-component";
+
+const columns = [
+    {
+        name: 'First Name',
+        selector: row => row.firstName
+    },
+    {
+        name: 'Last Name',
+        cell: row => row.lastName
+    },
+    {
+        name: 'Username',
+        selector: row => row.username
+    },
+    {
+        name: 'Email',
+        selector: row => row.email
+    },
+    {
+        name: 'Status',
+        selector: row => row.status
+    },
+  ];
 
 const UserPage = () => {
     const { userStore } = useStore();
 
+    const [error] = useState(null);
+    const [isLoaded, setIsLoaded] = useState(false);
+    const [totalRows, setTotalRows] = useState(0);
+    const [pageSize, setPageSize] = useState(10);
+
     useEffect(() => {
-        userStore.getUsersAsync();
+        fetchData(1, pageSize);
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
-    return (
-        <div>
-            <div>               
-                <input ref={userStore.searchText} placeholder="Search Text.."></input>
-                <button onClick={() => userStore.getUsersAsync()} >Search</button>
-                {userStore.noUsers ? 'No users!' :
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>First name</th>
-                                <th>Last name</th>
-                                <th>Username</th>
-                                <th>Email</th>
-                                <th>Status</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        
-                            <tbody>
-                                {userStore.userList.map((user, index) =>
+    const fetchData = async (currentPage, pageSize) => {
+        await userStore.getUsersAsync(currentPage, pageSize);
+        setTotalRows(userStore.totalCount);
+        setIsLoaded(true);
+      }
 
-                                    <tr key={index}>
-                                        <td>{user.firstName}</td>
-                                        <td>{user.lastName}</td>
-                                        <td>{user.username}</td>
-                                        <td>{user.email}</td>
-                                        <td>{user.status}</td>
-                                        <td>
-                                            <button onClick={() => userStore.deleteUserAsync(user.id)} >Delete</button>
-                                        </td>
-                                    </tr>
-                                )}
-                            </tbody>
-                    </table>
-                }
+    const handlePageChange = page => {
+        fetchData(page, pageSize);
+      }
+    
+      const handlePerRowsChange = async (newPageSize, page) => {
+        setPageSize(newPageSize);
+        fetchData(page, newPageSize);
+      }
+
+      if (error) {
+        return <div>Error: {error.message}</div>;
+      } else if (!isLoaded) {
+        return <div>Loading...</div>;
+      } else {
+        return (
+            <div>
+                <div>               
+                    <input ref={userStore.searchText} placeholder="Search Text.."></input>
+                    <button onClick={() => userStore.getUsersAsync()} >Search</button>
+                    <DataTable 
+                        columns={columns}
+                        data={userStore.userList}
+                        pagination
+                        paginationServer
+                        onChangePage={handlePageChange}
+                        onChangeRowsPerPage={handlePerRowsChange}
+                        paginationTotalRows={totalRows}
+                    />     
+                </div>
             </div>
-        </div>
-    )
+        )
+    }
 }
 
-export default UserPage;
+export default observer(UserPage);

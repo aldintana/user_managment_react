@@ -11,7 +11,7 @@ class BaseService {
     };
 
     async getAsync(params) {
-        return await axios.get(this.baseUrl, { params });
+        return await axios.get(this.baseUrl, { params: params });
     };
 
     async getByIdAsync(id) {
