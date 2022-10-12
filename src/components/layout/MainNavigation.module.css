@@ -37,11 +37,3 @@
 .header a.active {
   color: white;
 }
-
-.badge {
-  background-color: #203acc;
-  color: white;
-  border-radius: 12px;
-  padding: 0 1rem;
-  margin-left: 0.5rem;
-}

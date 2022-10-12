@@ -3,6 +3,7 @@ import { useStore } from "../../../stores";
 import { observer } from "mobx-react";
 import DataTable from "react-data-table-component";
 import { Modal, Button } from "react-bootstrap";
+import { Link } from 'react-router-dom';
 
 const UserPage = () => {
     const { userStore } = useStore();
@@ -96,6 +97,7 @@ const UserPage = () => {
                       </Button>
                     </Modal.Footer>
                   </Modal>
+                  <button><Link to={'/edit-user/' + row.id}>Edit</Link></button>
                 </td>
               )
         },

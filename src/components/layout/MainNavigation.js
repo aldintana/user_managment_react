@@ -12,6 +12,9 @@ function MainNavigation() {
           <li>
             <Link to='/'>All Users</Link>
           </li>
+          <li>
+            <Link to='/create-user'>Create User</Link>
+          </li>
         </ul>
       </nav>
     </header>
