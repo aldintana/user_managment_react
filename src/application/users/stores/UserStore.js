@@ -6,18 +6,19 @@ class UserStore {
     userList = [];
     totalCount = 0;
     searchText = React.createRef('');
-    
     constructor() {
         this.userService = new UserService();
         makeAutoObservable(this);
     }
 
-    async getUsersAsync(currentPage, pageSize) {
+    async getUsersAsync(currentPage, pageSize, sortName, sortDirection) {
         var response = await this.userService.getAsync(
             {
                 textSearch: this.searchText.current ? this.searchText.current.value : '',
                 currentPage: currentPage ? currentPage : 1,
-                pageSize: pageSize ? pageSize : 10
+                pageSize: pageSize ? pageSize : 10,
+                sortName: sortName,
+                sortDirection: sortDirection
             }
         );
         runInAction(() => {
@@ -28,6 +29,7 @@ class UserStore {
 
     async deleteUserAsync(id){
         await this.userService.deleteAsync(id);
+        this.getUsersAsync();
     }
 
     get noUsers() {
