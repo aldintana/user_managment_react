@@ -62,8 +62,6 @@ class UserStore {
             if (isCreate) {
                 response = await this.userService.insertAsync(Object.assign(model, { username: this.username.current.value, password: this.password.current.value }));
             } else {
-                console.log('iddd', id);
-                console.log('model', model);
                 response = await this.userService.updateAsync(model, id)
             }
 

@@ -1,8 +1,9 @@
 import { createContext, useContext } from "react";
 import UserStore from "./application/users/stores/UserStore";
-
+import UserPermissionStore from "./application/userPermissions/stores/UserPermissionStore";
 const store = {
-    userStore: new UserStore()
+    userStore: new UserStore(),
+    userPermissionStore: new UserPermissionStore()
 }
 
 export const StoreContext = createContext(store);

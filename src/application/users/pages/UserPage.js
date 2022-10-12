@@ -11,7 +11,8 @@ const UserPage = () => {
     const [isLoaded, setIsLoaded] = useState(false);
     const [pageSize, setPageSize] = useState(10);
     const [currentPage, setCurrentPage] = useState(1);
-
+    const [show, setShow] = useState(false);
+    const [id, setId] = useState(0);
     useEffect(() => {
         fetchData(1, pageSize);
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -27,81 +28,78 @@ const UserPage = () => {
         fetchData(page, pageSize);
       }
     
-      const handlePerRowsChange = async (newPageSize, page) => {
+    const handlePerRowsChange = async (newPageSize, page) => {
         setPageSize(newPageSize);
         fetchData(page, newPageSize);
       }
 
-      const handleSort = (selectedColumn, sortDirection) => {
+    const handleSort = (selectedColumn, sortDirection) => {
         fetchData(currentPage, pageSize, selectedColumn.key, sortDirection);
       }
-
-      const [show, setShow] = useState(false);
-      const [id, setId] = useState(0);
-
-      const handleClose = () => setShow(false);
-      const handleShow = (id) => 
+    const handleClose = () => setShow(false);
+    const handleShow = (id) => 
       {
         setShow(true);
         setId(id);
       };
-      const columns = [
-        {
-            key: 'FirstName',
-            name: 'First Name',
-            selector: row => row.firstName,
-            sortable: true
+    const columns = [
+      {
+          key: 'FirstName',
+          name: 'First Name',
+          selector: row => row.firstName,
+          sortable: true
+      },
+      {
+          key: 'LastName',
+          name: 'Last Name',
+          cell: row => row.lastName,
+          sortable: true
+      },
+      {
+          key: 'Username',
+          name: 'Username',
+          selector: row => row.username,
+          sortable: true
+      },
+      {
+          key: 'Email',
+          name: 'Email',
+          selector: row => row.email,
+          sortable: true
+      },
+      {
+          name: 'Status',
+          selector: row => row.status
+      },
+      {
+          name: 'Action',
+          cell: row =>
+            (
+              <td>
+                <button onClick={() => handleShow(row.id)}>Delete</button>
+                <Modal show={show} onHide={handleClose}>
+                  <Modal.Header closeButton>
+                    <Modal.Title>Are you sure you want to delete this user?</Modal.Title>
+                  </Modal.Header>
+                  <Modal.Footer>
+                    <Button variant="contained" color="error" onClick={() => 
+                      {
+                          userStore.deleteUserAsync(id);
+                          handleClose();
+                      }}>
+                      Yes
+                    </Button>
+                    <Button variant="contained" onClick={handleClose}>
+                      No
+                    </Button>
+                  </Modal.Footer>
+                </Modal>
+                <button><Link to={'/edit-user/' + row.id}>Edit</Link></button>
+                <button><Link to={'/userPermissions/' + row.id}>Assign</Link></button>
+              </td>
+            )
         },
-        {
-            key: 'LastName',
-            name: 'Last Name',
-            cell: row => row.lastName,
-            sortable: true
-        },
-        {
-            key: 'Username',
-            name: 'Username',
-            selector: row => row.username,
-            sortable: true
-        },
-        {
-            key: 'Email',
-            name: 'Email',
-            selector: row => row.email,
-            sortable: true
-        },
-        {
-            name: 'Status',
-            selector: row => row.status
-        },
-        {
-            name: 'Action',
-            cell: row =>
-              (
-                <td>
-                 <button onClick={() => handleShow(row.id)}>Delete</button>
-                  <Modal show={show} onHide={handleClose}>
-                    <Modal.Header closeButton>
-                      <Modal.Title>Are you sure?</Modal.Title>
-                    </Modal.Header>
-                    <Modal.Footer>
-                      <Button variant="contained" color="error" onClick={() => 
-                        {
-                            userStore.deleteUserAsync(id);
-                            handleClose();
-                        }}>
-                        Yes
-                      </Button>
-                      <Button variant="contained" onClick={handleClose}>
-                        No
-                      </Button>
-                    </Modal.Footer>
-                  </Modal>
-                  <button><Link to={'/edit-user/' + row.id}>Edit</Link></button>
-                </td>
-              )
-        },
-      ];
+        ];
 
       if (error) {
         return <div>Error: {error.message}</div>;
@@ -123,6 +121,7 @@ const UserPage = () => {
                         onChangeRowsPerPage={handlePerRowsChange}
                         paginationTotalRows={userStore.totalCount}
                         onSort={handleSort}  
+                        sortServer
                     />     
                 </div>
             </div>
